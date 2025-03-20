@@ -1,101 +1,60 @@
-import { useState } from "react";
-import { getTest } from "../api/testApi";
+import { useEffect, useState } from "react";
+import { fetchTests, getTest } from "../api/testApi";
+import { useNavigate } from "react-router-dom";
 
 export default function StartTest() {
-  const [testName, setTestName] = useState("");
-  const [categoryName, setCategoryName] = useState("");
-  const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [answers, setAnswers] = useState({});
+  const [tests, setTests] = useState([]);
+  const navigate = useNavigate();
 
-  const handleFetchTest = async () => {
-    if (!testName || !categoryName) {
-      alert("Please provide both test name and category!");
-      return;
-    }
-    setLoading(true);
+  // Fetch all test names & categories on load
+  useEffect(() => {
+    const loadTests = async () => {
+      try {
+        const data = await fetchTests();
+        setTests(data);
+      } catch (err) {
+        console.error("Failed to load tests", err);
+      }
+    };
+    loadTests();
+  }, []);
+
+  // When user clicks a test, fetch random 20 questions
+  const handleStart = async (testName, categoryName) => {
     try {
-      const response = await getTest(testName, categoryName);
-      setQuestions(response.questions);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching test:", error);
-      setLoading(false);
+      const testData = await getTest(testName, categoryName);
+      console.log("Fetched Questions: ", testData.questions);
+
+      // You can navigate to a quiz page and pass questions there
+      navigate("/quiz", { state: { questions: testData.questions } });
+    } catch (err) {
+      console.error("Failed to fetch random questions", err);
     }
-  };
-
-  const handleOptionChange = (index, option) => {
-    setAnswers((prev) => ({ ...prev, [index]: option }));
-  };
-
-  const handleSubmit = () => {
-    console.log("User answers:", answers);
-    alert("Test submitted! (For now just logs answers to console)");
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Start Test</h2>
-
-      {/* Input fields */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Enter Test Name (e.g., Mock Interview Test)"
-          className="border p-2 rounded w-full mb-2"
-          value={testName}
-          onChange={(e) => setTestName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Enter Category (e.g., Math)"
-          className="border p-2 rounded w-full mb-4"
-          value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
-        />
-        <button
-          className="bg-blue-500 text-white p-2 rounded w-full"
-          onClick={handleFetchTest}
-        >
-          Fetch Test
-        </button>
-      </div>
-
-      {loading && <div>Loading questions...</div>}
-
-      {/* Questions Section */}
-      {questions.length > 0 && !loading && (
-        <>
-          {questions.map((q, index) => (
-            <div key={index} className="mb-6">
-              <p className="font-semibold mb-2">
-                {index + 1}. {q.question}
-              </p>
-              <div className="space-y-1">
-                {q.options.map((opt, idx) => (
-                  <label key={idx} className="block">
-                    <input
-                      type="radio"
-                      name={`q${index}`}
-                      value={opt}
-                      checked={answers[index] === opt}
-                      onChange={() => handleOptionChange(index, opt)}
-                      className="mr-2"
-                    />
-                    {opt}
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-          <button
-            className="bg-green-500 text-white p-2 rounded w-full"
-            onClick={handleSubmit}
+    <div className="p-6 max-w-xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Select a Test to Start</h2>
+      {tests.length === 0 && <p>Loading tests...</p>}
+      <div className="space-y-4">
+        {tests.map((test) => (
+          <div
+            key={test._id}
+            className="border p-4 rounded flex justify-between items-center"
           >
-            Submit Test
-          </button>
-        </>
-      )}
+            <div>
+              <p className="font-semibold">{test.testName}</p>
+              <p className="text-sm text-gray-500">{test.categoryName}</p>
+            </div>
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded"
+              onClick={() => handleStart(test.testName, test.categoryName)}
+            >
+              Start Test
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

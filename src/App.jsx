@@ -5,6 +5,7 @@ import CreateTest from "./pages/CreateTest";
 import ManageTests from "./pages/ManageTests";
 import UpdateQuestions from "./pages/UpdateQuestions";
 import StartTest from "./pages/StartTest";
+import QuizPage from "./pages/QuizPage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
             <Route path="/manage-tests" element={<ManageTests />} />
             <Route path="/update-questions" element={<UpdateQuestions />} />
             <Route path="/start-test" element={<StartTest />} />
+            <Route path="/quiz" element={<QuizPage />} />
           </Routes>
         </div>
       </div>
