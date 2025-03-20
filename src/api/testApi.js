@@ -31,7 +31,9 @@ export const deleteQuestion = async (questionId) => {
 };
 
 // 🟢 Get 20 random questions (new)
+
+// 🟢 Get 20 random questions for a given testName + categoryName
 export const getTest = async (testName, categoryName) => {
-  const response = await axios.get(`${API_URL}/get-random/${categoryName}/${testName}`);
-  return response.data;
+  const response = await axios.get(`${API_URL}/get-random/${testName}/${categoryName}/`);
+  return response.data; // assuming backend returns { randomQuestions: [...] }
 };

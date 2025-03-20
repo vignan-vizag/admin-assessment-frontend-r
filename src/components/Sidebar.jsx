@@ -31,6 +31,11 @@ export default function Sidebar() {
               Start Test
             </Link>
           </li>
+          <li>
+            <Link to="/quiz" className="block p-2 hover:bg-gray-700 rounded">
+              Quiz Page
+            </Link>
+          </li>
         </ul>
       </nav>
     </div>
