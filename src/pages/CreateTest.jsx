@@ -1,36 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { createTest } from "../api/testApi";
 
 export default function CreateTest() {
   const [testName, setTestName] = useState("");
   const [questionsText, setQuestionsText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const navigate = useNavigate();
 
   const categoriesOptions = ["Coding", "Math", "Behavioral", "Aptitude"];
-
-  const parseQuestions = (text) => {
-    const lines = text.trim().split("\n");
-    return lines.map((line, idx) => {
-      const match = line.match(/^(.*?)\s+\((.*?)\)\s+\[(.*?)\]$/);
-      if (!match) {
-        throw new Error(`Invalid format in line ${idx + 1}`);
-      }
-
-      const question = match[1].trim();
-      const options = match[2].split(",").map((opt) => opt.trim());
-      const correctAnswer = match[3].trim();
-
-      if (!options.includes(correctAnswer)) {
-        throw new Error(
-          `Correct answer "${correctAnswer}" not found in options for line ${idx + 1}`
-        );
-      }
-
-      return { question, options, correctAnswer };
-    });
-  };
 
   const handleCreateTest = async () => {
     if (!testName.trim() || !questionsText.trim() || !selectedCategory) {
@@ -38,35 +13,38 @@ export default function CreateTest() {
       return;
     }
 
-    let parsedQuestions = [];
-    try {
-      parsedQuestions = parseQuestions(questionsText);
-    } catch (err) {
-      alert(err.message);
-      return;
-    }
-
-    console.log("Payload sent to API:", {
+    // Create the payload in the expected format:
+    const payload = {
       testName,
       categoryName: selectedCategory,
-      questions: parsedQuestions,
-    });
+      questionsText, // Sending the raw questions text
+    };
+
+    console.log("Payload sent to API:", payload);
+    alert("Initiating API call. Check console for payload details.");
 
     try {
-      const response = await createTest({
-        testName,
-        categoryName: selectedCategory,
-        questions: parsedQuestions,
+      const response = await fetch("http://localhost:4000/api/tests/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
+      console.log("API response:", response);
 
-      alert(response.message || "Test created successfully!");
-      setTestName("");
+      const resultText = await response.text();
+      console.log("Result text from API:", resultText);
+      
+      alert("API call completed: " + resultText);
+      
+      // Clear only the questions text and the selected category,
+      // keeping the testName intact for further uploads.
       setQuestionsText("");
       setSelectedCategory("");
-      navigate("/start-test");
     } catch (error) {
-      alert("Error creating test");
-      console.log(error);
+      console.error("Error during API call:", error);
+      alert("Error creating test: " + error.message);
     }
   };
 
@@ -102,13 +80,19 @@ export default function CreateTest() {
 
       <textarea
         rows={10}
-        placeholder={`Format:\nQuestion Text (opt1, opt2, opt3, opt4) [correctAnswer]\n\nExample:\nWhat is 2+2? (2, 3, 4, 5) [4]\nWho is CEO of Tesla? (Jeff, Elon, Bill, Mark) [Elon]`}
+        placeholder={`Format:
+Question Text (opt1, opt2, opt3, opt4) [correctAnswer]
+
+Example:
+What is 2+2? (2, 3, 4, 5) [4]
+Who is CEO of Tesla? (Jeff, Elon, Bill, Mark) [Elon]`}
         className="border p-2 rounded w-full mb-4"
         value={questionsText}
         onChange={(e) => setQuestionsText(e.target.value)}
       ></textarea>
 
       <button
+        type="button"
         className="bg-blue-500 text-white p-2 rounded w-full"
         onClick={handleCreateTest}
       >

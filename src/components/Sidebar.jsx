@@ -16,25 +16,25 @@ export default function Sidebar() {
               Create Test
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/manage-tests" className="block p-2 hover:bg-gray-700 rounded">
               Manage Tests
             </Link>
-          </li>
-          <li>
+          </li> */}
+          {/* <li>
             <Link to="/update-questions" className="block p-2 hover:bg-gray-700 rounded">
               Update Questions
-            </Link>
-          </li>
+            </Link> */}
+          {/* </li> */}
           <li>
             <Link to="/start-test" className="block p-2 hover:bg-gray-700 rounded">
               Start Test
             </Link>
           </li>
           <li>
-            <Link to="/quiz" className="block p-2 hover:bg-gray-700 rounded">
+            {/* <Link to="/quiz" className="block p-2 hover:bg-gray-700 rounded">
               Quiz Page
-            </Link>
+            </Link> */}
           </li>
         </ul>
       </nav>

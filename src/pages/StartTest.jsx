@@ -1,60 +1,57 @@
 import { useEffect, useState } from "react";
-import { fetchTests, getTest } from "../api/testApi";
 import { useNavigate } from "react-router-dom";
 
 export default function StartTest() {
   const [tests, setTests] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch all test names & categories on load
   useEffect(() => {
     const loadTests = async () => {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+      };
+
       try {
-        const data = await fetchTests();
+        const response = await fetch("http://localhost:4000/api/tests/all", requestOptions);
+        const data = await response.json(); // Parse JSON response
+        console.log("API response:", data);  // Debug: log the full API response
         setTests(data);
-      } catch (err) {
-        console.error("Failed to load tests", err);
+      } catch (error) {
+        console.error("Error fetching tests:", error);
       }
     };
+
     loadTests();
   }, []);
 
-  // When user clicks a test, fetch random 20 questions
-  const handleStart = async (testName, categoryName) => {
-    try {
-      const testData = await getTest(testName, categoryName);
-      console.log("Fetched Questions: ", testData.questions);
-
-      // You can navigate to a quiz page and pass questions there
-      navigate("/quiz", { state: { questions: testData.questions } });
-    } catch (err) {
-      console.error("Failed to fetch random questions", err);
-    }
+  // When a test is clicked, redirect to a placeholder page
+  const handleTestClick = (testId) => {
+    // For now, we redirect to a test-specific page (e.g., /test/:id)
+    navigate(`/test/${testId}`);
   };
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Select a Test to Start</h2>
-      {tests.length === 0 && <p>Loading tests...</p>}
-      <div className="space-y-4">
-        {tests.map((test) => (
-          <div
-            key={test._id}
-            className="border p-4 rounded flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">{test.testName}</p>
-              <p className="text-sm text-gray-500">{test.categoryName}</p>
-            </div>
-            <button
-              className="bg-green-500 text-white px-3 py-1 rounded"
-              onClick={() => handleStart(test.testName, test.categoryName)}
+      <h2 className="text-2xl font-bold mb-4">Test List</h2>
+      {tests.length === 0 ? (
+        <p>Loading tests...</p>
+      ) : (
+        <ul>
+          {tests.map((test) => (
+            <li 
+              key={test._id} 
+              className="mb-2 cursor-pointer hover:underline" 
+              onClick={() => handleTestClick(test._id)}
             >
-              Start Test
-            </button>
-          </div>
-        ))}
-      </div>
+              {test.testName}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
