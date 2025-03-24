@@ -7,49 +7,49 @@ export default function CreateTest() {
 
   const categoriesOptions = ["Coding", "Math", "Behavioral", "Aptitude"];
   function parseQuestionDocument(text) {
-    const lines = text.split('\n').filter(line => line.trim());
-    const questions = [];
-
-    let currentQuestion = {};
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (line.startsWith('Question:')) {
-        if (currentQuestion.text) {
-          questions.push(currentQuestion);
+    const questionBlocks = text.trim().split(/(?=Question:)/g); // Split at each 'Question:'
+    const parsedQuestions = [];
+    
+    questionBlocks.forEach(q => {
+        const match = q.match(/Question: (.*?)\r\n(.*?)\r\nAnswer: (.*)/);
+        if (match) {
+            const questionText = match[1];
+            const opt=match[2]
+            let options=[]
+            let f=0;
+            let s=''
+            for (let i = 0; i < opt.length-1; i++) {
+              if(f===0 && opt[i]===')'){
+                f=1
+              }
+              else if(f===1 &&opt[i+1]===')'){
+                options.push(s.trim())
+                s=''
+                f=0
+              }
+              else if(f===1){
+                s+=opt[i]
+              }
+            }
+            options.push((s+opt[opt.length-1]).trim())
+            const answer = match[3].trim();
+            
+            parsedQuestions.push({
+                id: crypto.randomUUID(),
+                text: questionText,
+                options: options,
+                answer: answer
+            });
         }
+    });
+    
 
-        currentQuestion = {
-          id: crypto.randomUUID(),
-          text: line.replace('Question:', '').trim(),
-          options: [],
-          answer: ''
-        };
-      } else if (line.startsWith('A)') || line.startsWith('A.') || line.includes('A)')) {
-        const optionsLine = line;
-        const options = [];
-        const optionMatches = optionsLine.match(/[A-D][\)\.]\s+[^A-D\)\.]+/g) || [];
-
-        for (const match of optionMatches) {
-          const option = match.replace(/^[A-D][\)\.]\s+/, '').trim();
-          options.push(option);
-        }
-
-        currentQuestion.options = options;
-      } else if (line.startsWith('Answer:')) {
-        currentQuestion.answer = line.replace('Answer:', '').trim();
-      }
-    }
-
-    if (currentQuestion.text) {
-      questions.push(currentQuestion);
-    }
     let string = ``
-    questions.forEach((question) => {
+    parsedQuestions.forEach((question) => {
       const options = question.options.map((option) => option).join(",");
       string += `${question.text}(${options})[${question.answer}]\n`
     })
+    console.log(parsedQuestions)
     return string
   }
 
