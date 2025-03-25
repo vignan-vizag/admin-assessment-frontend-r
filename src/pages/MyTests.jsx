@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function StartTest() {
+export default function MyTests() {
   const [tests, setTests] = useState([]);
   const navigate = useNavigate();
 
