@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 
 export default function Dashboard() {
+  const [year, setYear] = useState('');
   const [test, setTest] = useState('');
   const [branch, setBranch] = useState('');
   const [section, setSection] = useState('');
   const [category, setCategory] = useState('');
-  const [year, setYear] = useState('');
 
   const handleProceed = () => {
-    alert(`Test: ${test}\nBranch: ${branch}\nSection: ${section}\nCategory: ${category}\nPassing Out Year: ${year}`);
+    if (!year) {
+      alert("Passing Out Year is mandatory!");
+      return;
+    }
+    alert(
+      `Passing Out Year: ${year}\nTest: ${test}\nBranch: ${branch}\nSection: ${section}\nCategory: ${category}`
+    );
   };
 
   return (
@@ -17,6 +23,27 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <p className="mb-6">Welcome to the Admin Panel</p>
         <div className="space-y-4">
+          {/* Passing Out Year Dropdown (Mandatory) */}
+          <div>
+            <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
+              Passing Out Year <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="yearDropdown"
+              name="yearDropdown"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              required
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">-- Choose a year --</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+            </select>
+          </div>
+
           {/* Test Dropdown */}
           <div>
             <label htmlFor="testDropdown" className="block text-gray-700 font-medium mb-2">
@@ -103,26 +130,6 @@ export default function Dashboard() {
               <option value="math">Math</option>
               <option value="behavioral">Behavioral</option>
               <option value="aptitude">Aptitude</option>
-            </select>
-          </div>
-
-          {/* Passing Out Year Dropdown */}
-          <div>
-            <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
-              Passing Out Year:
-            </label>
-            <select
-              id="yearDropdown"
-              name="yearDropdown"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="">-- Choose a year --</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
-              <option value="2029">2029</option>
             </select>
           </div>
 
