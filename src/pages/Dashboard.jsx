@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Dashboard() {
   const [year, setYear] = useState('');
@@ -6,15 +6,74 @@ export default function Dashboard() {
   const [branch, setBranch] = useState('');
   const [section, setSection] = useState('');
   const [category, setCategory] = useState('');
+  const [tests, setTests] = useState([]);
+  const [ranks, setRanks] = useState(null);
 
-  const handleProceed = () => {
-    if (!year) {
-      alert("Passing Out Year is mandatory!");
-      return;
+  // Fetch list of tests on mount
+  useEffect(() => {
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    fetch("http://localhost:4000/api/tests/all", {
+      method: "GET",
+      headers,
+      redirect: "follow"
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        console.log("Tests List:", result);
+        setTests(result);
+      })
+      .catch((error) => console.error("Error fetching tests:", error));
+  }, []);
+
+  const handleProceed = async () => {
+    try {
+      // Log the selected values for debugging
+      console.log("Proceed clicked!");
+      console.log("Selected Year:", year);
+      console.log("Selected Test:", test);
+      console.log("Selected Branch:", branch);
+      console.log("Selected Section:", section);
+      console.log("Selected Category:", category);
+
+      // Build the JSON body exactly as required by the API
+      const requestBody = {
+        year,
+        testName: test,
+        branch,
+        section,
+        category
+      };
+
+      console.log("Request Body:", requestBody);
+
+      const response = await fetch("http://localhost:4000/api/tests/getStudentsRanks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+        redirect: "follow"
+      });
+
+      console.log("Response status:", response.status);
+      console.log("Response OK?:", response.ok);
+
+      const rawText = await response.text();
+      console.log("Raw response text:", rawText);
+
+      const data = JSON.parse(rawText);
+      console.log("Parsed JSON data:", data);
+
+      if (data.studentsRanks) {
+        setRanks(data.studentsRanks);
+        console.log("Setting ranks state to:", data.studentsRanks);
+      } else {
+        setRanks([]);
+        console.log("No studentsRanks array in response, setting ranks to empty array.");
+      }
+    } catch (error) {
+      console.error("Error in handleProceed:", error);
     }
-    alert(
-      `Passing Out Year: ${year}\nTest: ${test}\nBranch: ${branch}\nSection: ${section}\nCategory: ${category}`
-    );
   };
 
   return (
@@ -22,19 +81,19 @@ export default function Dashboard() {
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <p className="mb-6">Welcome to the Admin Panel</p>
+
         <div className="space-y-4">
-          {/* Passing Out Year Dropdown (Mandatory) */}
+          {/* Passing Out Year Dropdown */}
           <div>
             <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
-              Passing Out Year <span className="text-red-500">*</span>
+              Passing Out Year
             </label>
             <select
               id="yearDropdown"
               name="yearDropdown"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              required
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
             >
               <option value="">-- Choose a year --</option>
               <option value="2026">2026</option>
@@ -54,12 +113,14 @@ export default function Dashboard() {
               name="testDropdown"
               value={test}
               onChange={(e) => setTest(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
             >
               <option value="">-- Choose a test --</option>
-              <option value="test1">Test 1</option>
-              <option value="test2">Test 2</option>
-              <option value="test3">Test 3</option>
+              {tests.map((t) => (
+                <option key={t._id} value={t.testName}>
+                  {t.testName}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -73,20 +134,20 @@ export default function Dashboard() {
               name="branchDropdown"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
             >
               <option value="">-- Choose a branch --</option>
-              <option value="cse">CSE</option>
-              <option value="ece">ECE</option>
-              <option value="eee">EEE</option>
-              <option value="aids">AIDS</option>
-              <option value="ai">AI</option>
-              <option value="ds">DS</option>
-              <option value="cs">CS</option>
-              <option value="mech">Mech</option>
-              <option value="civil">Civil</option>
-              <option value="ecm">ECM</option>
-              <option value="it">IT</option>
+              <option value="CSE">CSE</option>
+              <option value="ECE">ECE</option>
+              <option value="EEE">EEE</option>
+              <option value="AIDS">AIDS</option>
+              <option value="AI">AI</option>
+              <option value="DS">DS</option>
+              <option value="CS">CS</option>
+              <option value="MECH">MECH</option>
+              <option value="CIVIL">CIVIL</option>
+              <option value="ECM">ECM</option>
+              <option value="IT">IT</option>
             </select>
           </div>
 
@@ -100,7 +161,8 @@ export default function Dashboard() {
               name="sectionDropdown"
               value={section}
               onChange={(e) => setSection(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              disabled={!(year && branch)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
             >
               <option value="">-- Choose a section --</option>
               <option value="1">Section 1</option>
@@ -123,13 +185,13 @@ export default function Dashboard() {
               name="categoryDropdown"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
             >
               <option value="">-- Choose a category --</option>
-              <option value="coding">Coding</option>
-              <option value="math">Math</option>
-              <option value="behavioral">Behavioral</option>
-              <option value="aptitude">Aptitude</option>
+              <option value="CODING">Coding</option>
+              <option value="MATH">Math</option>
+              <option value="BEHAVIORAL">Behavioral</option>
+              <option value="APTITUDE">Aptitude</option>
             </select>
           </div>
 
@@ -138,12 +200,54 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={handleProceed}
-              className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700"
             >
               Proceed
             </button>
           </div>
         </div>
+
+        {/* Display API Response in a Table */}
+        {ranks && ranks.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-bold mb-4">Students Ranks</h2>
+            <table className="min-w-full border border-gray-200">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border">Rank</th>
+                  <th className="py-2 px-4 border">Reg No</th>
+                  <th className="py-2 px-4 border">Name</th>
+                  <th className="py-2 px-4 border">Total Marks</th>
+                  {category && (
+                    <th className="py-2 px-4 border">{category} Marks</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {ranks.map((student, index) => (
+                  <tr key={index}>
+                    <td className="py-2 px-4 border">{student.rank}</td>
+                    <td className="py-2 px-4 border">{student.reg_no}</td>
+                    <td className="py-2 px-4 border">{student.name}</td>
+                    <td className="py-2 px-4 border">{student.totalMarks}</td>
+                    {category && (
+                      <td className="py-2 px-4 border">
+                        {student[category.toLowerCase()] ?? 'N/A'}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Show a message if ranks is an empty array */}
+        {ranks && ranks.length === 0 && (
+          <div className="mt-6">
+            <p>No student rank data available.</p>
+          </div>
+        )}
       </div>
     </div>
   );
