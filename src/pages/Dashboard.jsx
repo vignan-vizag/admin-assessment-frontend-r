@@ -29,7 +29,6 @@ export default function Dashboard() {
 
   const handleProceed = async () => {
     try {
-      // Log the selected values for debugging
       console.log("Proceed clicked!");
       console.log("Selected Year:", year);
       console.log("Selected Test:", test);
@@ -37,7 +36,6 @@ export default function Dashboard() {
       console.log("Selected Section:", section);
       console.log("Selected Category:", category);
 
-      // Build the JSON body exactly as required by the API
       const requestBody = {
         year,
         testName: test,
@@ -77,13 +75,13 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-        <p className="mb-6">Welcome to the Admin Panel</p>
+    
+      <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[30px]">
+      <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center">Dashboard</h1>
+        <p className="mb-6 text-gray-600 text-center">Welcome to the Admin Panel</p>
 
         <div className="space-y-4">
-          {/* Passing Out Year Dropdown */}
           <div>
             <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
               Passing Out Year
@@ -93,7 +91,7 @@ export default function Dashboard() {
               name="yearDropdown"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a year --</option>
               <option value="2026">2026</option>
@@ -103,7 +101,6 @@ export default function Dashboard() {
             </select>
           </div>
 
-          {/* Test Dropdown */}
           <div>
             <label htmlFor="testDropdown" className="block text-gray-700 font-medium mb-2">
               Select Test:
@@ -113,7 +110,7 @@ export default function Dashboard() {
               name="testDropdown"
               value={test}
               onChange={(e) => setTest(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a test --</option>
               {tests.map((t) => (
@@ -124,7 +121,6 @@ export default function Dashboard() {
             </select>
           </div>
 
-          {/* Branch Dropdown */}
           <div>
             <label htmlFor="branchDropdown" className="block text-gray-700 font-medium mb-2">
               Branch:
@@ -134,7 +130,7 @@ export default function Dashboard() {
               name="branchDropdown"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a branch --</option>
               <option value="CSE">CSE</option>
@@ -151,103 +147,17 @@ export default function Dashboard() {
             </select>
           </div>
 
-          {/* Section Dropdown */}
-          <div>
-            <label htmlFor="sectionDropdown" className="block text-gray-700 font-medium mb-2">
-              Section:
-            </label>
-            <select
-              id="sectionDropdown"
-              name="sectionDropdown"
-              value={section}
-              onChange={(e) => setSection(e.target.value)}
-              disabled={!(year && branch)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
-            >
-              <option value="">-- Choose a section --</option>
-              <option value="1">Section 1</option>
-              <option value="2">Section 2</option>
-              <option value="3">Section 3</option>
-              <option value="4">Section 4</option>
-              <option value="5">Section 5</option>
-              <option value="6">Section 6</option>
-              <option value="7">Section 7</option>
-            </select>
-          </div>
-
-          {/* Category Dropdown */}
-          <div>
-            <label htmlFor="categoryDropdown" className="block text-gray-700 font-medium mb-2">
-              Category:
-            </label>
-            <select
-              id="categoryDropdown"
-              name="categoryDropdown"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
-            >
-              <option value="">-- Choose a category --</option>
-              <option value="CODING">Coding</option>
-              <option value="MATH">Math</option>
-              <option value="BEHAVIORAL">Behavioral</option>
-              <option value="APTITUDE">Aptitude</option>
-            </select>
-          </div>
-
-          {/* Proceed Button */}
           <div className="mt-6">
             <button
               type="button"
               onClick={handleProceed}
-              className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700"
+              className="w-full py-2 px-4 bg-[#0A4CA4] text-white font-semibold rounded-md shadow-md hover:bg-[#062B5B] focus:outline-none focus:ring-2 focus:ring-[#08387F] transition-all"
             >
               Proceed
             </button>
           </div>
+
         </div>
-
-        {/* Display API Response in a Table */}
-        {ranks && ranks.length > 0 && (
-          <div className="mt-6">
-            <h2 className="text-xl font-bold mb-4">Students Ranks</h2>
-            <table className="min-w-full border border-gray-200">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border">Rank</th>
-                  <th className="py-2 px-4 border">Reg No</th>
-                  <th className="py-2 px-4 border">Name</th>
-                  <th className="py-2 px-4 border">Total Marks</th>
-                  {category && (
-                    <th className="py-2 px-4 border">{category} Marks</th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {ranks.map((student, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border">{student.rank}</td>
-                    <td className="py-2 px-4 border">{student.reg_no}</td>
-                    <td className="py-2 px-4 border">{student.name}</td>
-                    <td className="py-2 px-4 border">{student.totalMarks}</td>
-                    {category && (
-                      <td className="py-2 px-4 border">
-                        {student[category.toLowerCase()] ?? 'N/A'}
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Show a message if ranks is an empty array */}
-        {ranks && ranks.length === 0 && (
-          <div className="mt-6">
-            <p>No student rank data available.</p>
-          </div>
-        )}
       </div>
     </div>
   );

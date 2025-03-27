@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
+import { UploadCloud } from "lucide-react";
 
 export default function CreateTest() {
   const [testName, setTestName] = useState("");
   const [questionsText, setQuestionsText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState(""); // Track uploaded file name
   const fileInputRef = useRef(null);
 
   const categoriesOptions = ["Coding", "Math", "Behavioral", "Aptitude"];
@@ -11,7 +13,7 @@ export default function CreateTest() {
   function parseQuestionDocument(text) {
     const questionBlocks = text.trim().split(/(?=Question:)/g); // Split at each 'Question:'
     const parsedQuestions = [];
-    
+
     questionBlocks.forEach((q) => {
       const match = q.match(/Question: (.*?)\r\n(.*?)\r\nAnswer: (.*)/);
       if (match) {
@@ -19,13 +21,13 @@ export default function CreateTest() {
         const opt = match[2];
         let options = [];
         let f = 0;
-        let s = '';
+        let s = "";
         for (let i = 0; i < opt.length - 1; i++) {
-          if (f === 0 && opt[i] === ')') {
+          if (f === 0 && opt[i] === ")") {
             f = 1;
-          } else if (f === 1 && opt[i + 1] === ')') {
+          } else if (f === 1 && opt[i + 1] === ")") {
             options.push(s.trim());
-            s = '';
+            s = "";
             f = 0;
           } else if (f === 1) {
             s += opt[i];
@@ -33,16 +35,16 @@ export default function CreateTest() {
         }
         options.push((s + opt[opt.length - 1]).trim());
         const answer = match[3].trim();
-        
+
         parsedQuestions.push({
           id: crypto.randomUUID(),
           text: questionText,
           options: options,
-          answer: answer
+          answer: answer,
         });
       }
     });
-    
+
     let string = ``;
     parsedQuestions.forEach((question) => {
       const options = question.options.join(",");
@@ -55,6 +57,9 @@ export default function CreateTest() {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    setUploadedFileName(file.name); // Store file name in state
+
     const reader = new FileReader();
     reader.onload = (event) => {
       if (event.target?.result) {
@@ -63,7 +68,7 @@ export default function CreateTest() {
       }
     };
     reader.onerror = () => {
-      console.log("error");
+      console.log("Error reading file");
     };
     reader.readAsText(file);
   };
@@ -73,11 +78,11 @@ export default function CreateTest() {
       alert("Please fill all fields including category!");
       return;
     }
-    // Create the payload in the expected format:
+
     const payload = {
       testName,
       categoryName: selectedCategory,
-      questionsText, // Sending the raw questions text
+      questionsText, // Sending raw questions text
     };
 
     console.log("Payload sent to API:", payload);
@@ -98,10 +103,10 @@ export default function CreateTest() {
 
       alert("API call completed: " + resultText);
 
-      // Clear the questions text, reset the category, and clear the file input.
-      // The testName remains intact.
+      // Reset fields except testName
       setQuestionsText("");
       setSelectedCategory("");
+      setUploadedFileName(""); // Clear file name
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -112,49 +117,70 @@ export default function CreateTest() {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Create New Test</h2>
+    <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[30px]">
 
-      <input
-        type="text"
-        placeholder="Enter test name"
-        className="border p-2 rounded w-full mb-4"
-        value={testName}
-        onChange={(e) => setTestName(e.target.value)}
-      />
+      <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Create New Test</h2>
 
-      <div className="mb-4">
-        <p className="mb-2 font-semibold">Select Category:</p>
-        <div className="flex flex-wrap gap-2">
-          {categoriesOptions.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`border px-3 py-1 rounded ${selectedCategory === cat ? "bg-blue-500 text-white" : ""}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+        <input
+          type="text"
+          placeholder="Enter test name"
+          className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 mb-4"
+          value={testName}
+          onChange={(e) => setTestName(e.target.value)}
+        />
+
+        <div className="mb-4">
+          <p className="mb-2 font-semibold text-gray-700 text-center">Select Category:</p>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categoriesOptions.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`border px-3 py-1 border-gray-300 rounded-md shadow-sm focus:outline-none cursor-pointer hover:bg-gray-200 mb-4 ${
+                  selectedCategory === cat ? "bg-blue-500 text-white" : ""
+                }`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* File Upload Section */}
+        <div
+          className="flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 cursor-pointer transition mb-4"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <UploadCloud className="w-10 h-10 text-indigo-500 mb-3" />
+          <p className="text-gray-700 font-medium">Click to upload or drag and drop</p>
+          <p className="text-sm text-gray-500">Supports .txt, .docx files</p>
+          <input
+            type="file"
+            id="fileUpload"
+            className="hidden"
+            accept=".txt,.docx"
+            onChange={handleFileUpload}
+            ref={fileInputRef}
+          />
+        </div>
+
+        {/* Display the uploaded file name */}
+        {uploadedFileName && (
+          <p className="text-sm text-gray-600 mb-4 text-center">
+            Uploaded file: <span className="font-semibold text-gray-800">{uploadedFileName}</span>
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="w-full py-2 px-4 bg-[#0A4CA4] text-white font-semibold rounded-md shadow-md hover:bg-[#062B5B] focus:outline-none focus:ring-2 focus:ring-[#08387F] transition-all"
+          onClick={handleCreateTest}
+        >
+          Save Test
+        </button>
       </div>
-
-      <input
-        type="file"
-        id="fileUpload"
-        className="border p-2 rounded w-full mb-4"
-        accept=".txt,.docx"
-        onChange={handleFileUpload}
-        ref={fileInputRef}
-      />
-
-      <button
-        type="button"
-        className="bg-blue-500 text-white p-2 rounded w-full"
-        onClick={handleCreateTest}
-      >
-        Save Test
-      </button>
     </div>
   );
 }
