@@ -5,9 +5,10 @@ export default function Dashboard() {
   const [branch, setBranch] = useState('');
   const [section, setSection] = useState('');
   const [category, setCategory] = useState('');
+  const [year, setYear] = useState('');
 
   const handleProceed = () => {
-    alert(`Test: ${test}\nBranch: ${branch}\nSection: ${section}\nCategory: ${category}`);
+    alert(`Test: ${test}\nBranch: ${branch}\nSection: ${section}\nCategory: ${category}\nPassing Out Year: ${year}`);
   };
 
   return (
@@ -102,6 +103,26 @@ export default function Dashboard() {
               <option value="math">Math</option>
               <option value="behavioral">Behavioral</option>
               <option value="aptitude">Aptitude</option>
+            </select>
+          </div>
+
+          {/* Passing Out Year Dropdown */}
+          <div>
+            <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
+              Passing Out Year:
+            </label>
+            <select
+              id="yearDropdown"
+              name="yearDropdown"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="">-- Choose a year --</option>
+              <option value="2026">2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
             </select>
           </div>
 

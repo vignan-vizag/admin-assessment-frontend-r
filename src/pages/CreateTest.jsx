@@ -1,56 +1,55 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function CreateTest() {
   const [testName, setTestName] = useState("");
   const [questionsText, setQuestionsText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const fileInputRef = useRef(null);
 
   const categoriesOptions = ["Coding", "Math", "Behavioral", "Aptitude"];
+
   function parseQuestionDocument(text) {
-    const lines = text.split('\n').filter(line => line.trim());
-    const questions = [];
-
-    let currentQuestion = {};
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (line.startsWith('Question:')) {
-        if (currentQuestion.text) {
-          questions.push(currentQuestion);
+    const questionBlocks = text.trim().split(/(?=Question:)/g); // Split at each 'Question:'
+    const parsedQuestions = [];
+    
+    questionBlocks.forEach((q) => {
+      const match = q.match(/Question: (.*?)\r\n(.*?)\r\nAnswer: (.*)/);
+      if (match) {
+        const questionText = match[1];
+        const opt = match[2];
+        let options = [];
+        let f = 0;
+        let s = '';
+        for (let i = 0; i < opt.length - 1; i++) {
+          if (f === 0 && opt[i] === ')') {
+            f = 1;
+          } else if (f === 1 && opt[i + 1] === ')') {
+            options.push(s.trim());
+            s = '';
+            f = 0;
+          } else if (f === 1) {
+            s += opt[i];
+          }
         }
-
-        currentQuestion = {
+        options.push((s + opt[opt.length - 1]).trim());
+        const answer = match[3].trim();
+        
+        parsedQuestions.push({
           id: crypto.randomUUID(),
-          text: line.replace('Question:', '').trim(),
-          options: [],
-          answer: ''
-        };
-      } else if (line.startsWith('A)') || line.startsWith('A.') || line.includes('A)')) {
-        const optionsLine = line;
-        const options = [];
-        const optionMatches = optionsLine.match(/[A-D][\)\.]\s+[^A-D\)\.]+/g) || [];
-
-        for (const match of optionMatches) {
-          const option = match.replace(/^[A-D][\)\.]\s+/, '').trim();
-          options.push(option);
-        }
-
-        currentQuestion.options = options;
-      } else if (line.startsWith('Answer:')) {
-        currentQuestion.answer = line.replace('Answer:', '').trim();
+          text: questionText,
+          options: options,
+          answer: answer
+        });
       }
-    }
-
-    if (currentQuestion.text) {
-      questions.push(currentQuestion);
-    }
-    let string = ``
-    questions.forEach((question) => {
-      const options = question.options.map((option) => option).join(",");
-      string += `${question.text}(${options})[${question.answer}]\n`
-    })
-    return string
+    });
+    
+    let string = ``;
+    parsedQuestions.forEach((question) => {
+      const options = question.options.join(",");
+      string += `${question.text}(${options})[${question.answer}]\n`;
+    });
+    console.log(parsedQuestions);
+    return string;
   }
 
   const handleFileUpload = (e) => {
@@ -58,14 +57,13 @@ export default function CreateTest() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      console.log(event)
       if (event.target?.result) {
         setQuestionsText(parseQuestionDocument(event.target.result));
         console.log("File uploaded successfully");
       }
     };
     reader.onerror = () => {
-      console.log('error')
+      console.log("error");
     };
     reader.readAsText(file);
   };
@@ -75,7 +73,6 @@ export default function CreateTest() {
       alert("Please fill all fields including category!");
       return;
     }
-    console.log(questionsText)
     // Create the payload in the expected format:
     const payload = {
       testName,
@@ -101,10 +98,13 @@ export default function CreateTest() {
 
       alert("API call completed: " + resultText);
 
-      // Clear only the questions text and the selected category,
-      // keeping the testName intact for further uploads.
+      // Clear the questions text, reset the category, and clear the file input.
+      // The testName remains intact.
       setQuestionsText("");
       setSelectedCategory("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error("Error during API call:", error);
       alert("Error creating test: " + error.message);
@@ -130,8 +130,7 @@ export default function CreateTest() {
             <button
               key={cat}
               type="button"
-              className={`border px-3 py-1 rounded ${selectedCategory === cat ? "bg-blue-500 text-white" : ""
-                }`}
+              className={`border px-3 py-1 rounded ${selectedCategory === cat ? "bg-blue-500 text-white" : ""}`}
               onClick={() => setSelectedCategory(cat)}
             >
               {cat}
@@ -146,7 +145,9 @@ export default function CreateTest() {
         className="border p-2 rounded w-full mb-4"
         accept=".txt,.docx"
         onChange={handleFileUpload}
+        ref={fileInputRef}
       />
+
       <button
         type="button"
         className="bg-blue-500 text-white p-2 rounded w-full"
