@@ -76,7 +76,7 @@ export default function Dashboard() {
 
   return (
     
-      <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[30px]">
+      <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[70px]">
       <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center">Dashboard</h1>
         <p className="mb-6 text-gray-600 text-center">Welcome to the Admin Panel</p>
@@ -147,17 +147,104 @@ export default function Dashboard() {
             </select>
           </div>
 
+          <div>
+            <label htmlFor="sectionDropdown" className="block text-gray-700 font-medium mb-2">
+              Section:
+            </label>
+            <select
+              id="sectionDropdown"
+              name="sectionDropdown"
+              value={section}
+              onChange={(e) => setSection(e.target.value)}
+              disabled={!(year && branch)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+            >
+              <option value="">-- Choose a section --</option>
+              <option value="1">Section 1</option>
+              <option value="2">Section 2</option>
+              <option value="3">Section 3</option>
+              <option value="4">Section 4</option>
+              <option value="5">Section 5</option>
+              <option value="6">Section 6</option>
+              <option value="7">Section 7</option>
+            </select>
+          </div>
+
+          {/* Category Dropdown */}
+          <div>
+            <label htmlFor="categoryDropdown" className="block text-gray-700 font-medium mb-2">
+              Category:
+            </label>
+            <select
+              id="categoryDropdown"
+              name="categoryDropdown"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+            >
+              <option value="">-- Choose a category --</option>
+              <option value="CODING">Coding</option>
+              <option value="MATH">Math</option>
+              <option value="BEHAVIORAL">Behavioral</option>
+              <option value="APTITUDE">Aptitude</option>
+            </select>
+          </div>
+
+          {/* Proceed Button */}
           <div className="mt-6">
             <button
               type="button"
               onClick={handleProceed}
-              className="w-full py-2 px-4 bg-[#0A4CA4] text-white font-semibold rounded-md shadow-md hover:bg-[#062B5B] focus:outline-none focus:ring-2 focus:ring-[#08387F] transition-all"
+              className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700"
             >
               Proceed
             </button>
           </div>
-
         </div>
+
+        {/* Display API Response in a Table */}
+        {ranks && ranks.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-xl font-bold mb-4">Students Ranks</h2>
+            <table className="min-w-full border border-gray-200">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border">Rank</th>
+                  <th className="py-2 px-4 border">Reg No</th>
+                  <th className="py-2 px-4 border">Name</th>
+                  <th className="py-2 px-4 border">Total Marks</th>
+                  {category && (
+                    <th className="py-2 px-4 border">{category} Marks</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {ranks.map((student, index) => (
+                  <tr key={index}>
+                    <td className="py-2 px-4 border">{student.rank}</td>
+                    <td className="py-2 px-4 border">{student.reg_no}</td>
+                    <td className="py-2 px-4 border">{student.name}</td>
+                    <td className="py-2 px-4 border">{student.totalMarks}</td>
+                    {category && (
+                      <td className="py-2 px-4 border">
+                        {student[category.toLowerCase()] ?? 'N/A'}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Show a message if ranks is an empty array */}
+        {ranks && ranks.length === 0 && (
+          <div className="mt-6">
+            <p>No student rank data available.</p>
+          </div>
+        )}
+
+        
       </div>
     </div>
   );

@@ -137,7 +137,7 @@ export default function CreateTest() {
               <button
                 key={cat}
                 type="button"
-                className={`border px-3 py-1 border-gray-300 rounded-md shadow-sm focus:outline-none cursor-pointer hover:bg-gray-200 mb-4 ${
+                className={`border px-3 py-1 border-gray-300 rounded-md shadow-sm focus:outline-none cursor-pointer hover:bg-blue-300 mb-4 ${
                   selectedCategory === cat ? "bg-blue-500 text-white" : ""
                 }`}
                 onClick={() => setSelectedCategory(cat)}
