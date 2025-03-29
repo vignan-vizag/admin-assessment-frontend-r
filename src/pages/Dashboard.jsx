@@ -29,6 +29,16 @@ export default function Dashboard() {
 
   const handleProceed = async () => {
     try {
+      // Validate mandatory fields: Passing Out Year and Test Name
+      if (!year) {
+        alert("Passing Out Year is mandatory!");
+        return;
+      }
+      if (!test) {
+        alert("Test is mandatory!");
+        return;
+      }
+
       console.log("Proceed clicked!");
       console.log("Selected Year:", year);
       console.log("Selected Test:", test);
@@ -36,6 +46,7 @@ export default function Dashboard() {
       console.log("Selected Section:", section);
       console.log("Selected Category:", category);
 
+      // Build the JSON body as required by the API
       const requestBody = {
         year,
         testName: test,
@@ -75,16 +86,16 @@ export default function Dashboard() {
   };
 
   return (
-    
-      <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[70px]">
+    <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[70px]">
       <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg border border-gray-200">
         <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center">Dashboard</h1>
         <p className="mb-6 text-gray-600 text-center">Welcome to the Admin Panel</p>
 
         <div className="space-y-4">
+          {/* Passing Out Year Dropdown */}
           <div>
             <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
-              Passing Out Year
+              Passing Out Year <span className="text-red-500">*</span>
             </label>
             <select
               id="yearDropdown"
@@ -101,9 +112,10 @@ export default function Dashboard() {
             </select>
           </div>
 
+          {/* Test Dropdown */}
           <div>
             <label htmlFor="testDropdown" className="block text-gray-700 font-medium mb-2">
-              Select Test:
+              Select Test <span className="text-red-500">*</span>
             </label>
             <select
               id="testDropdown"
@@ -121,6 +133,7 @@ export default function Dashboard() {
             </select>
           </div>
 
+          {/* Branch Dropdown */}
           <div>
             <label htmlFor="branchDropdown" className="block text-gray-700 font-medium mb-2">
               Branch:
@@ -147,6 +160,7 @@ export default function Dashboard() {
             </select>
           </div>
 
+          {/* Section Dropdown */}
           <div>
             <label htmlFor="sectionDropdown" className="block text-gray-700 font-medium mb-2">
               Section:
@@ -237,14 +251,11 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Show a message if ranks is an empty array */}
         {ranks && ranks.length === 0 && (
           <div className="mt-6">
             <p>No student rank data available.</p>
           </div>
         )}
-
-        
       </div>
     </div>
   );
