@@ -7,14 +7,22 @@ import UpdateQuestions from "./pages/UpdateQuestions";
 import StartTest from "./pages/StartTest";
 import QuizPage from "./pages/QuizPage";
 import MyTests from "./pages/MyTests";
-
-// Layout for pages that include the Sidebar
+const HEADER_HEIGHT = "80px"; // Set a fixed height for the header
 function MainLayout() {
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="flex-1 p-6">
-        <Outlet />
+    <div className="flex flex-col">
+      {/* Directly include header image here */}
+      <div className="bg-gray-100 pt-0 pb-0 pl-6 pr-6 flex items-center justify-center w-[79%] h-auto fixed top-0 right-0 z-10">
+
+
+        <img src="/title_head.jpg" alt="Header" />
+      </div>
+
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 p-6">
+          <Outlet />
+        </div>
       </div>
     </div>
   );
@@ -24,7 +32,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Routes wrapped with the Sidebar */}
+        {/* Routes wrapped with Sidebar and Header */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/create-test" element={<CreateTest />} />
@@ -33,8 +41,8 @@ export default function App() {
           <Route path="/start-test" element={<StartTest />} />
           <Route path="/quiz" element={<QuizPage />} />
         </Route>
-        {/* MyTests route rendered without the Sidebar */}
-        <Route path="/MyTests" element={<MyTests />} />
+        {/* MyTests route without Sidebar and Header */}
+        <Route path="/mytests" element={<MyTests />} />
       </Routes>
     </Router>
   );

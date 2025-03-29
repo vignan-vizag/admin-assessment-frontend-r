@@ -29,7 +29,16 @@ export default function Dashboard() {
 
   const handleProceed = async () => {
     try {
-      // Log the selected values for debugging
+      // Validate mandatory fields: Passing Out Year and Test Name
+      if (!year) {
+        alert("Passing Out Year is mandatory!");
+        return;
+      }
+      if (!test) {
+        alert("Test is mandatory!");
+        return;
+      }
+
       console.log("Proceed clicked!");
       console.log("Selected Year:", year);
       console.log("Selected Test:", test);
@@ -37,7 +46,7 @@ export default function Dashboard() {
       console.log("Selected Section:", section);
       console.log("Selected Category:", category);
 
-      // Build the JSON body exactly as required by the API
+      // Build the JSON body as required by the API
       const requestBody = {
         year,
         testName: test,
@@ -77,23 +86,23 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-        <p className="mb-6">Welcome to the Admin Panel</p>
+    <div className="min-h-screen bg-gray-100 p-6 pl-72 flex items-center justify-center mt-[70px]">
+      <div className="max-w-4xl w-full bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800 text-center">Dashboard</h1>
+        <p className="mb-6 text-gray-600 text-center">Welcome to the Admin Panel</p>
 
         <div className="space-y-4">
           {/* Passing Out Year Dropdown */}
           <div>
             <label htmlFor="yearDropdown" className="block text-gray-700 font-medium mb-2">
-              Passing Out Year
+              Passing Out Year <span className="text-red-500">*</span>
             </label>
             <select
               id="yearDropdown"
               name="yearDropdown"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a year --</option>
               <option value="2026">2026</option>
@@ -106,14 +115,14 @@ export default function Dashboard() {
           {/* Test Dropdown */}
           <div>
             <label htmlFor="testDropdown" className="block text-gray-700 font-medium mb-2">
-              Select Test:
+              Select Test <span className="text-red-500">*</span>
             </label>
             <select
               id="testDropdown"
               name="testDropdown"
               value={test}
               onChange={(e) => setTest(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a test --</option>
               {tests.map((t) => (
@@ -134,7 +143,7 @@ export default function Dashboard() {
               name="branchDropdown"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose a branch --</option>
               <option value="CSE">CSE</option>
@@ -242,7 +251,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Show a message if ranks is an empty array */}
         {ranks && ranks.length === 0 && (
           <div className="mt-6">
             <p>No student rank data available.</p>
