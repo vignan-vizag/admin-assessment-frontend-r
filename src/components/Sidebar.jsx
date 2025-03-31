@@ -31,9 +31,9 @@ export default function Sidebar() {
             </Link>
           </li> */}
           <li>
-            <Link to="/start-test" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
-              Start Test
-            </Link>
+            <a href="http://localhost:5173/MyTests" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
+              Manage Tests
+            </a>
           </li>
           <li>
             {/* <Link to="/quiz" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
