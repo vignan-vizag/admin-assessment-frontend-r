@@ -10,16 +10,19 @@ export default function Sidebar() {
       <h2 className="text-xl font-bold mb-6 text-gray-200 text-center">Admin Panel</h2>
       <nav>
         <ul className="space-y-3">
-          <li>
+
+
+        <li>
             <Link to="/" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link to="/create-test" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
               Create Test
             </Link>
           </li>
+          <li>
+            <Link to="/dashboard" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
+              Dashboard
+            </Link>
+          </li>
+        
           {/* <li>
             <Link to="/manage-tests" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
               Manage Tests
