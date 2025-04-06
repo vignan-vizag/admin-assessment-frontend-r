@@ -46,8 +46,9 @@ export default function App() {
       <Routes>
         {/* Routes wrapped with Sidebar and Header */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<CreateTest />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create-test" element={<CreateTest />} />
           <Route path="/manage-tests" element={<ManageTests />} />
           <Route path="/update-questions" element={<UpdateQuestions />} />
           <Route path="/start-test" element={<StartTest />} />
