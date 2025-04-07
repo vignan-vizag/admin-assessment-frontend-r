@@ -10,8 +10,8 @@ const INITIAL_FORM = {
 
 const YEARS = ["2026", "2027", "2028", "2029"];
 const BRANCHES = ["CSE", "ECE", "EEE", "AIDS", "AI", "DS", "CS", "MECH", "CIVIL", "ECM", "IT"];
-const SECTIONS = ["1", "2", "3", "4", "5", "6", "7"];
-const CATEGORIES = ["CODING", "MATH", "BEHAVIORAL", "APTITUDE"];
+const SECTIONS = ["A", "B", "C", "D", "E", "F", "G"];
+const CATEGORIES = ["Coding", "Math", "Behavioral", "Aptitude"];
 
 const API_BASE = "http://localhost:4000/api";
 
@@ -78,8 +78,6 @@ export default function Dashboard() {
   const handleProceed = useCallback(async () => {
     const { year, test, branch, section, category } = formData;
 
-    // console.log(test);
-
     if (!year || !test) {
       alert("Passing Out Year and Test are mandatory!");
       return;
@@ -91,25 +89,53 @@ export default function Dashboard() {
       const studentsData = await studentsResponse.json();
 
       const processedData = studentsData.map((student) => {
+        let categoryMarks = 0;
+
         const totalMarks = student.assignedTests.reduce((total, assignedTest) => {
-          const matchedTest = tests.find((t) => t.testName === test && t._id === assignedTest.testId);
-          // console.log(tests.map((t) => t.testName && t._id));
-          // console.log(assignedTest.testId);
-          // console.log(matchedTest);
+          const matchedTest = tests.find(
+            (t) => t.testName === test && t._id === assignedTest.testId
+          );
 
           if (matchedTest) {
-            const marks = Object.values(assignedTest.marks || {});
-            return total + marks.reduce((sum, mark) => sum + mark, 0);
+            if (category) {
+              const mark = assignedTest.marks?.[category];
+              // console.log(mark);
+              if (typeof mark === "number") categoryMarks += mark;
+              return total + (typeof mark === "number" ? mark : 0);
+            } else {
+              const marks = Object.values(assignedTest.marks || {});
+              return total + marks.reduce((sum, mark) => sum + mark, 0);
+            }
           }
           return total;
         }, 0);
+        // console.log(categoryMarks);
 
-        return { ...student, totalMarks };
+        return {
+          ...student,
+          totalMarks,
+          ...(category ? { categoryMark: categoryMarks } : {})
+        };
       });
 
-      processedData.sort((a, b) => b.totalMarks - a.totalMarks);
+      const filteredData = processedData.filter((student) => {
+        const matchesBranch = branch ? student.branch === branch : true;
+        const matchesSection = section ? student.section === section : true;
+        const matchesCategory = category
+          ? student.assignedTests.some((assignedTest) => {
+            const isTestMatched =
+              assignedTest.testId === tests.find((t) => t.testName === test)?._id;
+            const hasCategory = Object.keys(assignedTest.marks || {}).includes(category);
+            return isTestMatched && hasCategory;
+          })
+          : true;
 
-      const rankedData = processedData.map((student, index) => ({
+        return matchesBranch && matchesSection && matchesCategory;
+      });
+
+      filteredData.sort((a, b) => b.totalMarks - a.totalMarks);
+
+      const rankedData = filteredData.map((student, index) => ({
         ...student,
         rank: index + 1,
       }));
@@ -121,7 +147,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, [formData]);
+  }, [formData, tests]);
 
   const renderSelect = (label, key, options, required = false, disabled = false) => (
     <div key={key}>
@@ -197,7 +223,7 @@ export default function Dashboard() {
                         <td className="py-2 px-3 border text-sm">{student.totalMarks}</td>
                         {formData.category && (
                           <td className="py-2 px-3 border text-sm">
-                            {student[formData.category.toLowerCase()] ?? "N/A"}
+                            {student.categoryMark ?? "N/A"}
                           </td>
                         )}
                       </tr>
