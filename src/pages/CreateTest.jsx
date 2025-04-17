@@ -11,25 +11,52 @@ export default function CreateTest() {
   const fileInputRef = useRef(null);
 
   const parseQuestions = (text) => {
-    const questionBlocks = text.trim().split(/(?=Question:)/);
-    const parsedQuestions = questionBlocks.map((block) => {
-      const match = block.match(/Question: (.*?)\r?\n(.*?)\r?\nAnswer: (.*)/s);
-      if (!match) return null;
+    const lines = text.trim().split('\n').filter(line => line.trim());
+    const parsedQuestions = [];
 
-      const question = match[1].trim();
-      const optionsLine = match[2];
-      const answer = match[3].trim();
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i].trim();
 
-      const options = optionsLine
-        .match(/[A-D]\)\s*([^A-D]*)/g)
-        ?.map((opt) => opt.replace(/[A-D]\)\s*/, "").trim()) || [];
+      // --- FORMAT 1: Inline: "What is ...? (opt1, opt2, opt3, opt4) [answer]"
+      const inlineMatch = line.match(/^(.*?)\s*\((.*?)\)\s*\[(.*?)\]$/);
+      if (inlineMatch) {
+        const question = inlineMatch[1].trim();
+        const options = inlineMatch[2].split(',').map(o => o.trim());
+        const answer = inlineMatch[3].trim();
 
-      return {
-        text: question,
-        options,
-        answer,
-      };
-    }).filter(Boolean);
+        if (options.length === 4 && options.includes(answer)) {
+          parsedQuestions.push({ text: question, options, answer });
+        }
+
+        i++;
+        continue;
+      }
+
+      // --- FORMAT 2: Block format: Question: ...\n A)...B)... \n Answer: ...
+      if (line.startsWith("Question:")) {
+        const question = line.replace("Question:", "").trim();
+        const optionsLine = lines[i + 1]?.trim();
+        const answerLine = lines[i + 2]?.trim();
+
+        const optionMatch = optionsLine?.match(/A\)\s*(.*?)\s*B\)\s*(.*?)\s*C\)\s*(.*?)\s*D\)\s*(.*)/);
+        const answer = answerLine?.replace("Answer:", "").trim();
+
+        if (optionMatch && answer) {
+          const options = optionMatch.slice(1, 5).map(opt => opt.trim());
+
+          if (options.length === 4 && options.includes(answer)) {
+            parsedQuestions.push({ text: question, options, answer });
+          }
+        }
+
+        i += 3;
+        continue;
+      }
+
+      // skip unknown line format
+      i++;
+    }
 
     return parsedQuestions.map(q =>
       `${q.text}(${q.options.join(",")})[${q.answer}]`
@@ -106,8 +133,8 @@ export default function CreateTest() {
                 key={category}
                 type="button"
                 className={`px-3 py-1 rounded-md border shadow-sm ${selectedCategory === category
-                    ? "bg-blue-500 text-white"
-                    : "border-gray-300 hover:bg-blue-100"
+                  ? "bg-blue-500 text-white"
+                  : "border-gray-300 hover:bg-blue-100"
                   }`}
                 onClick={() => setSelectedCategory(category)}
               >
