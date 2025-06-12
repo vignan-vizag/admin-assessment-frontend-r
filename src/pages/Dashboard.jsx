@@ -12,7 +12,7 @@ const INITIAL_FORM = {
 
 const YEARS = ["2026", "2027", "2028", "2029"];
 const BRANCHES = ["CSE", "ECE", "EEE", "AIDS", "AI", "DS", "CS", "MECH", "CIVIL", "ECM", "IT"];
-const SECTIONS = ["A", "B", "C", "D", "E", "F", "G"];
+const SECTIONS = ["1", "2", "3", "4", "5", "6", "7" , "8"];
 const CATEGORIES = ["Coding", "Math", "Behavioral", "Aptitude"];
 
 const API_BASE = "http://localhost:4000/api";
@@ -22,9 +22,23 @@ export default function Dashboard() {
   const [tests, setTests] = useState([]);
   const [ranks, setRanks] = useState(null);
   const [loading, setLoading] = useState(false);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+
+  // Calculate pagination values
+  const totalPages = ranks ? Math.ceil(ranks.length / itemsPerPage) : 0;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageData = ranks ? ranks.slice(startIndex, endIndex) : [];
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  // Reset pagination when new data is loaded
+  const resetPagination = () => {
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -41,41 +55,9 @@ export default function Dashboard() {
     fetchTests();
   }, []);
 
-  // const handleProceed = useCallback(async () => {
-  //   const { year, test, branch, section, category } = formData;
-
-  //   if (!year || !test) {
-  //     alert("Passing Out Year and Test are mandatory!");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     const response = await fetch(`${API_BASE}/tests/getStudentsRanks`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         year,
-  //         testName: test,
-  //         branch,
-  //         section,
-  //         category,
-  //       }),
-  //     });
-
-  //     const text = await response.text();
-  //     const data = JSON.parse(text);
-
-  //     setRanks(data?.studentsRanks || []);
-  //     console.log(data?.studentsRanks);
-
-  //   } catch (error) {
-  //     console.error("Error getting ranks:", error);
-  //     setRanks([]);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, [formData]);
+  useEffect(() => {
+    resetPagination();
+  }, [ranks]);
 
   const handleProceed = useCallback(async () => {
     const { year, test, branch, section, category } = formData;
@@ -143,9 +125,11 @@ export default function Dashboard() {
       }));
 
       setRanks(rankedData || []);
+      resetPagination(); // Reset to first page when new data is loaded
     } catch (error) {
       console.error("Error getting ranks:", error);
       setRanks([]);
+      resetPagination();
     } finally {
       setLoading(false);
     }
@@ -388,6 +372,74 @@ export default function Dashboard() {
     </div>
   );
 
+  // Pagination component
+  const renderPagination = () => {
+    if (!ranks || ranks.length <= itemsPerPage) return null;
+
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex justify-center items-center mt-6 space-x-2">
+        <button
+          onClick={() => setCurrentPage(1)}
+          disabled={currentPage === 1}
+          className="px-3 py-2 text-sm bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          First
+        </button>
+        
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-2 text-sm bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        {pageNumbers.map(number => (
+          <button
+            key={number}
+            onClick={() => setCurrentPage(number)}
+            className={`px-3 py-2 text-sm rounded-md ${
+              currentPage === number
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            }`}
+          >
+            {number}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 text-sm bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+
+        <button
+          onClick={() => setCurrentPage(totalPages)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 text-sm bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Last
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6 ">
       <div className="flex flex-col md:flex-row gap-6">
@@ -421,6 +473,14 @@ export default function Dashboard() {
           {ranks ? (
             ranks.length > 0 ? (
               <div>
+                {/* Summary info */}
+                <div className="mb-4 text-sm text-gray-600 flex justify-between items-center">
+                  <span>Total Students: {ranks.length}</span>
+                  <span>
+                    Showing {startIndex + 1}-{Math.min(endIndex, ranks.length)} of {ranks.length}
+                  </span>
+                </div>
+                
                 <div className="overflow-x-auto">
                   <table className="min-w-full border border-gray-200">
                     <thead>
@@ -435,7 +495,7 @@ export default function Dashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {ranks.map((student, idx) => (
+                      {currentPageData.map((student, idx) => (
                         <tr key={idx} className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                           <td className="py-2 px-3 border text-sm">{student.rank}</td>
                           <td className="py-2 px-3 border text-sm">{student.rollno}</td>
@@ -451,6 +511,56 @@ export default function Dashboard() {
                     </tbody>
                   </table>
                 </div>
+                <div className="mt-6 flex flex-col md:flex-row items-center justify-between">
+                  <div className="flex-1 flex gap-2">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                      <svg 
+                        className="w-5 h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M15 18l-6-6 6-6" 
+                        />
+                      </svg>
+                      <span>Previous</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow hover:bg-indigo-700 disabled:opacity-50"
+                    >
+                      <span>Next</span>
+                      <svg 
+                        className="w-5 h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M9 6l6 6-6 6" 
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="mt-4 md:mt-0">
+                    <span className="text-sm text-gray-500">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </div>
+                </div>
+                {renderPagination()}
                 <div className="mt-6 flex justify-center">
                   <button
                     onClick={generatePDF}
