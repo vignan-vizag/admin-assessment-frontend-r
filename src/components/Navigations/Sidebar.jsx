@@ -4,14 +4,15 @@ import { DashboardIcon, CreateTestIcon, ManageTestIcon, } from "../Elements/Icon
 const navItems = [
   { label: "Dashboard", to: "/" },
   { label: "Create Test", to: "/create-test" },
-  // { label: "Manage Tests", to: "http://localhost:5173/MyTests", external: true },
-  { label: "Manage Tests", to: "/mytests" },
+  { label: "Manage Tests", to: "/manage-tests" },
+  { label: "Manage Questions", to: "/manage-questions" },
 ];
 
 const iconMap = {
   Dashboard: <DashboardIcon className="w-5 h-5 shrink-0" />,
   "Create Test": <CreateTestIcon className="w-5 h-5 shrink-0" />,
   "Manage Tests": <ManageTestIcon className="w-5 h-5 shrink-0" />,
+  "Manage Questions": <ManageTestIcon className="w-5 h-5 shrink-0" />,
 };
 
 function NavItem({ label, to, external = false, isActive, isCollapsed }) {

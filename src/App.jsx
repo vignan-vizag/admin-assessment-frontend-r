@@ -3,6 +3,7 @@ import Sidebar from "./components/Navigations/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import CreateTest from "./pages/CreateTest";
 import ManageTests from "./pages/ManageTests";
+import ManageQuestions from "./pages/ManageQuestions";
 import UpdateQuestions from "./pages/UpdateQuestions";
 import StartTest from "./pages/StartTest";
 import QuizPage from "./pages/QuizPage";
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-test" element={<CreateTest />} />
           <Route path="/manage-tests" element={<ManageTests />} />
+          <Route path="/manage-questions" element={<ManageQuestions />} />
           <Route path="/update-questions" element={<UpdateQuestions />} />
           <Route path="/start-test" element={<StartTest />} />
           <Route path="/quiz" element={<QuizPage />} />

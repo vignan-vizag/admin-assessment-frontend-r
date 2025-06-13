@@ -1,10 +1,16 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/tests";
+const API_URL = "http://localhost:4000/api/tests";
 
 // 🟢 Create a new test
 export const createTest = async (testData) => {
   const response = await axios.post(`${API_URL}/create`, testData);
+  return response.data;
+};
+
+// 🔵 Update a test by testId
+export const updateTest = async (testId, updatedData) => {
+  const response = await axios.put(`${API_URL}/${testId}`, updatedData);
   return response.data;
 };
 
