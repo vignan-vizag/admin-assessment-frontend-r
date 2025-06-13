@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { API_CONFIG } from "../config/api";
 
-const baseUrl = "http://localhost:4000/api";
+const baseUrl = API_CONFIG.API_BASE;
 
 const tabs = ["Details", "Questions", "Assign Students"];
 

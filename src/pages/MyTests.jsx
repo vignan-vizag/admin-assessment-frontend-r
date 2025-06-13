@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_CONFIG } from "../config/api";
 
-const baseUrl = "http://localhost:4000/api";
+const baseUrl = API_CONFIG.API_BASE;
 
 export default function MyTests() {
   const [tests, setTests] = useState([]);

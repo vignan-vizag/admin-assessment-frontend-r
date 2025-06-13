@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { buildApiUrl, API_CONFIG } from "./src/config/api";
 
 export default function CreateTest() {
   const [testName, setTestName] = useState("");
@@ -87,7 +88,7 @@ export default function CreateTest() {
     alert("Initiating API call. Check console for payload details.");
 
     try {
-      const response = await fetch("http://localhost:4000/api/tests/create", {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.CREATE), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

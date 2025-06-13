@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { fetchTests } from "../api/testApi";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl, API_CONFIG } from "../config/api";
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = API_CONFIG.API_BASE;
 
 export default function ManageTests() {
   const [tests, setTests] = useState([]);
@@ -64,7 +65,7 @@ export default function ManageTests() {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE}/tests/${editingTest._id}`, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.UPDATE(editingTest._id)), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ export default function ManageTests() {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE}/tests/${testId}`, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.DELETE(testId)), {
         method: 'DELETE',
       });
 
@@ -132,7 +133,7 @@ export default function ManageTests() {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE}/tests/${testId}/status`, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.STATUS(testId)), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { buildApiUrl, API_CONFIG } from "../config/api";
 
 export default function UpdateQuestions() {
   const [testName, setTestName] = useState("");
@@ -13,7 +14,7 @@ export default function UpdateQuestions() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:5000/api/questions/add", {
+      const response = await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.QUESTIONS.ADD), {
         testName,
         category,
         question,

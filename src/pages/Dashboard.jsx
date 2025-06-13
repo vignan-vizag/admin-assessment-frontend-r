@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { API_CONFIG } from "../config/api";
 
 const INITIAL_FORM = {
   year: "",
@@ -15,7 +16,7 @@ const BRANCHES = ["CSE", "ECE", "EEE", "AIDS", "AI", "DS", "CS", "MECH", "CIVIL"
 const SECTIONS = ["1", "2", "3", "4", "5", "6", "7" , "8"];
 const CATEGORIES = ["Coding", "Math", "Behavioral", "Aptitude"];
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = API_CONFIG.API_BASE;
 
 export default function Dashboard() {
   const [formData, setFormData] = useState(INITIAL_FORM);

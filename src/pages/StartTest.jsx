@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl, API_CONFIG } from "../config/api";
 
 export default function StartTest() {
   const [tests, setTests] = useState([]);
@@ -8,7 +9,7 @@ export default function StartTest() {
   useEffect(() => {
     const loadTests = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/tests/all", {
+        const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.ALL), {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { fetchTests, fetchQuestions, updateQuestion, deleteQuestion } from "../api/testApi";
+import { buildApiUrl, API_CONFIG } from "../config/api";
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = API_CONFIG.API_BASE;
 
 export default function ManageQuestions() {
   const [tests, setTests] = useState([]);
@@ -40,7 +41,7 @@ export default function ManageQuestions() {
     setError("");
   
     try {
-      const response = await fetch(`${API_BASE}/tests/${testId}/questions`);
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.QUESTIONS(testId)));
       if (!response.ok) {
         throw new Error(`Failed to fetch questions: ${response.status}`);
       }
@@ -67,7 +68,7 @@ export default function ManageQuestions() {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE}/tests/questions/${editingQuestion._id}`, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.QUESTIONS.UPDATE(editingQuestion._id)), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,7 +103,7 @@ export default function ManageQuestions() {
     setSuccess("");
     
     try {
-      const response = await fetch(`${API_BASE}/tests/questions/${questionId}`, {
+      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.QUESTIONS.DELETE(questionId)), {
         method: 'DELETE',
       });
 
