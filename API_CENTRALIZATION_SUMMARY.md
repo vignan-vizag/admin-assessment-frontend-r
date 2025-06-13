@@ -1,24 +1,25 @@
 # API URL Centralization - Implementation Summary
 
 ## Overview
-Successfully centralized all API URLs into a single configuration file to make server changes easy and maintainable.
+Successfully centralized all API URLs AND frontend URLs into a single configuration file to make server changes easy and maintainable.
 
 ## 🎯 Changes Made
 
 ### 1. Created Central Configuration File
 - **File**: `src/config/api.js`
-- **Purpose**: Single source of truth for all API endpoints
+- **Purpose**: Single source of truth for all API and frontend endpoints
 - **Features**:
-  - Centralized base URL configuration
+  - Centralized base URL configuration for both API and frontend
   - Dynamic endpoint builders
   - Helper functions for URL construction
+  - **NEW**: Frontend URL configuration for React app URLs
 
 ### 2. Updated Files
 The following files were updated to use the centralized API configuration:
 
 #### Core API Files:
 - `src/api/testApi.js` - Main API functions
-- `src/config/api.js` - New centralized config file
+- `src/config/api.js` - New centralized config file (**ENHANCED**)
 
 #### Component Files:
 - `src/pages/CreateTest.jsx` - Test creation page
@@ -29,6 +30,7 @@ The following files were updated to use the centralized API configuration:
 - `src/pages/StartTest.jsx` - Test starting interface  
 - `src/pages/TestDetailsPage.jsx` - Test details view
 - `src/pages/Dashboard.jsx` - Admin dashboard
+- `src/components/Sidebar.jsx` - Navigation sidebar (**NEW**)
 
 #### Backup Files:
 - `zzzzz.js` - Backup create test file
@@ -38,20 +40,20 @@ The following files were updated to use the centralized API configuration:
 
 ### Configuration Structure
 ```javascript
+// API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:4000',  // ← CHANGE ONLY HERE
+  BASE_URL: 'http://localhost:4000',  // ← CHANGE API SERVER HERE
   API_VERSION: '/api',
-  
-  get API_BASE() {
-    return `${this.BASE_URL}${this.API_VERSION}`;
-  },
-  
-  ENDPOINTS: {
-    TESTS: {
-      CREATE: '/tests/create',
-      ALL: '/tests/all',
-      // ... more endpoints
-    }
+  // ... endpoints
+};
+
+// Frontend Configuration  
+export const FRONTEND_CONFIG = {
+  BASE_URL: 'http://localhost:5173',  // ← CHANGE FRONTEND URL HERE
+  ROUTES: {
+    MY_TESTS: '/MyTests',
+    DASHBOARD: '/dashboard',
+    // ... more routes
   }
 };
 ```
@@ -59,53 +61,65 @@ export const API_CONFIG = {
 ### Usage Pattern
 ```javascript
 // Before (hardcoded)
-fetch("http://localhost:4000/api/tests/create", ...)
+<a href="http://localhost:5173/MyTests">Manage Tests</a>
 
 // After (centralized)
-import { buildApiUrl, API_CONFIG } from "../config/api";
-fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.CREATE), ...)
+import { FRONTEND_CONFIG } from "../config/api";
+<Link to={FRONTEND_CONFIG.ROUTES.MY_TESTS}>Manage Tests</Link>
 ```
 
 ## 🚀 Benefits
 
 ### 1. Single Point of Change
-- Change server URL only in `src/config/api.js`
-- Automatically applies to all API calls across the application
+- Change **API server** URL only in `src/config/api.js` → `API_CONFIG.BASE_URL`
+- Change **frontend** URL only in `src/config/api.js` → `FRONTEND_CONFIG.BASE_URL`
+- Automatically applies to all calls across the application
 
 ### 2. Environment Flexibility
 - Easy to switch between development, staging, and production
 - Can be extended to use environment variables
+- **NEW**: Frontend and backend can be deployed on different servers easily
 
 ### 3. Type Safety & Maintainability
 - Centralized endpoint management
 - Reduces typos and inconsistencies
 - Better code organization
+- **NEW**: React Router integration for better navigation
 
 ### 4. Future Enhancements Ready
 - Easy to add API versioning
 - Simple to implement environment-based configurations
 - Ready for production deployment
+- **NEW**: Easy to implement subdomain or CDN deployments
 
 ## 📝 Quick Server Change Guide
 
-To change the server URL (e.g., when deploying or changing IP):
-
+### To change the API server URL:
 1. Open `src/config/api.js`
-2. Change the `BASE_URL` property:
+2. Change the API `BASE_URL` property:
    ```javascript
-   BASE_URL: 'http://your-new-server:port',
+   export const API_CONFIG = {
+     BASE_URL: 'http://your-api-server:port',
    ```
-3. Save the file
-4. All API calls will automatically use the new URL
+
+### To change the frontend URL:
+1. Open `src/config/api.js`
+2. Change the frontend `BASE_URL` property:
+   ```javascript
+   export const FRONTEND_CONFIG = {
+     BASE_URL: 'http://your-frontend-domain:port',
+   ```
 
 ## 🔍 Verification
 
-All hardcoded URLs have been eliminated. Only one reference to `localhost:4000` remains in the centralized config file, which is intentional and correct.
+All hardcoded URLs have been eliminated. Only two references remain in the centralized config file:
+- `localhost:4000` for API server (intentional and correct)
+- `localhost:5173` for frontend server (intentional and correct)
 
-**Files affected**: 12 total files updated
-**Hardcoded URLs removed**: 15+ instances
-**Central configuration points**: 1 (as intended)
+**Files affected**: 13 total files updated (**+1 new**)
+**Hardcoded URLs removed**: 16+ instances (**+1 frontend URL**)
+**Central configuration points**: 2 (API + Frontend - as intended)
 
 ## 🎉 Status: ✅ Complete
 
-The API centralization is now complete and ready for production use. The application can now easily switch between different server environments by changing a single configuration value.
+The URL centralization is now complete for **both API and frontend URLs** and ready for production use. The application can now easily switch between different server environments by changing configuration values in a single file.

@@ -31,9 +31,35 @@ export const API_CONFIG = {
   }
 };
 
-// Helper function to build complete URL
+// Frontend Configuration - Single source of truth for frontend URLs
+export const FRONTEND_CONFIG = {
+  BASE_URL: 'http://localhost:5173',
+  
+  // Frontend route builders
+  ROUTES: {
+    HOME: '/',
+    DASHBOARD: '/dashboard',
+    MY_TESTS: '/MyTests',
+    MANAGE_TESTS: '/manage-tests',
+    UPDATE_QUESTIONS: '/update-questions',
+    QUIZ: '/quiz',
+    START_TEST: '/start-test'
+  },
+  
+  // Helper to build complete frontend URLs
+  getFullUrl: (route) => {
+    return `${FRONTEND_CONFIG.BASE_URL}${route}`;
+  }
+};
+
+// Helper function to build complete API URL
 export const buildApiUrl = (endpoint) => {
   return `${API_CONFIG.API_BASE}${endpoint}`;
+};
+
+// Helper function to build complete frontend URL
+export const buildFrontendUrl = (route) => {
+  return FRONTEND_CONFIG.getFullUrl(route);
 };
 
 // Export for easy access

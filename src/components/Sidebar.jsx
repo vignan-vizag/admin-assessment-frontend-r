@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { FRONTEND_CONFIG } from "../config/api";
+
 export default function Sidebar() {
   return (
     <div className="w-64 h-screen bg-[#08387F] text-white p-4 shadow-lg fixed left-0 top-0">
@@ -34,9 +36,9 @@ export default function Sidebar() {
             </Link>
           </li> */}
           <li>
-            <a href="http://localhost:5173/MyTests" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
+            <Link to={FRONTEND_CONFIG.ROUTES.MY_TESTS} className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
               Manage Tests
-            </a>
+            </Link>
           </li>
           <li>
             {/* <Link to="/quiz" className="block p-3 bg-[#0A4CA4] hover:bg-[#062B5B] rounded text-gray-300 hover:text-white text-center font-medium transition-all">
