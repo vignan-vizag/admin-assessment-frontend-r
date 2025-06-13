@@ -6,15 +6,26 @@ const API_BASE = "http://localhost:4000/api";
 
 export default function ManageTests() {
   const [tests, setTests] = useState([]);
+  const [filteredTests, setFilteredTests] = useState([]);
   const [editingTest, setEditingTest] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const navigate = useNavigate();
 
   useEffect(() => {
     loadTests();
   }, []);
+
+  // Filter tests based on status
+  useEffect(() => {
+    if (statusFilter === "all") {
+      setFilteredTests(tests);
+    } else {
+      setFilteredTests(tests.filter(test => (test.status || 'offline') === statusFilter));
+    }
+  }, [tests, statusFilter]);
 
   // Clear messages after 3 seconds
   useEffect(() => {
@@ -60,7 +71,8 @@ export default function ManageTests() {
         },
         body: JSON.stringify({
           testName: editingTest.testName,
-          description: editingTest.description || ""
+          description: editingTest.description || "",
+          status: editingTest.status || "offline"
         }),
       });
 
@@ -114,10 +126,69 @@ export default function ManageTests() {
     navigate(`/test/${testId}`);
   };
 
+  const handleStatusChange = async (testId, newStatus) => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+    
+    try {
+      const response = await fetch(`${API_BASE}/tests/${testId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: newStatus
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update test status (${response.status}): ${errorText}`);
+      }
+
+      setSuccess(`Test status updated to ${newStatus} successfully!`);
+      
+      // Update the test status in the local state
+      setTests(tests.map(test => 
+        test._id === testId 
+          ? { ...test, status: newStatus }
+          : test
+      ));
+    } catch (error) {
+      console.error("Error updating test status:", error);
+      setError(`Error updating test status: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Manage Tests</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Manage Tests</h2>
+        
+        {/* Status Filter */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">Filter by status:</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="all">All Tests</option>
+            <option value="live">Live Tests</option>
+            <option value="offline">Offline Tests</option>
+          </select>
+        </div>
+      </div>
+      
+      {/* Test Count Display */}
+      <div className="mb-4 text-sm text-gray-600">
+        Showing {filteredTests.length} of {tests.length} tests
+        {statusFilter !== "all" && ` (${statusFilter} only)`}
+      </div>
       
       {/* Error Message */}
       {error && (
@@ -141,8 +212,12 @@ export default function ManageTests() {
       )}
 
       <div className="space-y-4">
-        {tests.map((test) => (
-          <div key={test._id} className="border border-gray-200 p-6 rounded-lg bg-white shadow-sm">
+        {filteredTests.map((test) => (
+          <div key={test._id} className={`border p-6 rounded-lg bg-white shadow-sm ${
+            test.status === 'live' 
+              ? 'border-green-200 bg-green-50' 
+              : 'border-gray-200'
+          }`}>
             {editingTest && editingTest._id === test._id ? (
               <div className="space-y-4">
                 <div>
@@ -164,6 +239,20 @@ export default function ManageTests() {
                     onChange={(e) => setEditingTest({ ...editingTest, description: e.target.value })}
                     placeholder="Enter test description (optional)"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Test Status</label>
+                  <select
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    value={editingTest.status || 'offline'}
+                    onChange={(e) => setEditingTest({ ...editingTest, status: e.target.value })}
+                  >
+                    <option value="offline">Offline</option>
+                    <option value="live">Live</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Live tests are available for students to take, offline tests are not accessible.
+                  </p>
                 </div>
                 <div className="flex gap-3">
                   <button 
@@ -198,10 +287,29 @@ export default function ManageTests() {
                       {test.categories && test.categories.length > 0 && (
                         <p>Categories: {test.categories.map(cat => cat.categoryName).join(', ')}</p>
                       )}
+                      <div className="flex items-center mt-2">
+                        <span className="mr-2">Status:</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          test.status === 'live' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {test.status === 'live' ? '🟢 Live' : '⭕ Offline'}
+                        </span>
+                        <select
+                          value={test.status || 'offline'}
+                          onChange={(e) => handleStatusChange(test._id, e.target.value)}
+                          className="ml-3 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          disabled={loading}
+                        >
+                          <option value="offline">Offline</option>
+                          <option value="live">Live</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <button 
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors" 
                     onClick={() => handleEdit(test)}
@@ -217,6 +325,17 @@ export default function ManageTests() {
                     Manage Questions
                   </button>
                   <button 
+                    className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 ${
+                      test.status === 'live' 
+                        ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
+                    onClick={() => handleStatusChange(test._id, test.status === 'live' ? 'offline' : 'live')}
+                    disabled={loading}
+                  >
+                    {test.status === 'live' ? 'Set Offline' : 'Set Live'}
+                  </button>
+                  <button 
                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors" 
                     onClick={() => handleDelete(test._id)}
                     disabled={loading}
@@ -230,9 +349,14 @@ export default function ManageTests() {
         ))}
       </div>
 
-      {tests.length === 0 && !loading && (
+      {filteredTests.length === 0 && !loading && (
         <div className="text-center py-8">
-          <p className="text-gray-500">No tests found. Create a test to get started.</p>
+          <p className="text-gray-500">
+            {statusFilter === "all" 
+              ? "No tests found. Create a test to get started." 
+              : `No ${statusFilter} tests found.`
+            }
+          </p>
         </div>
       )}
     </div>
