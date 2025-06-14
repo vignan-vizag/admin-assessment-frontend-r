@@ -1,6 +1,6 @@
 // API Configuration - Single source of truth for all API endpoints
 export const API_CONFIG = {
-  BASE_URL: 'http://ec2-54-89-201-245.compute-1.amazonaws.com:4000/',
+  BASE_URL: 'http://ec2-54-89-201-245.compute-1.amazonaws.com:4000',
   API_VERSION: '/api',
   
   // Get the complete API base URL
@@ -33,7 +33,7 @@ export const API_CONFIG = {
 
 // Frontend Configuration - Single source of truth for frontend URLs
 export const FRONTEND_CONFIG = {
-  BASE_URL: 'http://ec2-54-172-203-36.compute-1.amazonaws.com:5173/',
+  BASE_URL: 'http://ec2-54-172-203-36.compute-1.amazonaws.com:5173',
   
   // Frontend route builders
   ROUTES: {
