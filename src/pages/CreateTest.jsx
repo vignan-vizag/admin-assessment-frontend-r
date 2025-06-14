@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { UploadCloud } from "lucide-react";
 import { buildApiUrl, API_CONFIG } from "../config/api";
 
-const CATEGORY_OPTIONS = ["Coding", "Math", "Behavioral", "Aptitude"];
+const CATEGORY_OPTIONS = ["Coding", "Aptitude", "Reasoning", "Verbal"];
 
 export default function CreateTest() {
   const [testName, setTestName] = useState("");

@@ -9,7 +9,7 @@ export default function UpdateQuestions() {
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correctAnswer, setCorrectAnswer] = useState("");
 
-  const categories = ["Coding", "Math", "Aptitude", "Behavioral"];
+  const categories = ["Coding", "Aptitude", "Reasoning", "Verbal"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();

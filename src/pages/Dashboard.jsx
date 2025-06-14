@@ -14,7 +14,7 @@ const INITIAL_FORM = {
 const YEARS = ["2026", "2027", "2028", "2029"];
 const BRANCHES = ["CSE", "ECE", "EEE", "AIDS", "AI", "DS", "CS", "MECH", "CIVIL", "ECM", "IT"];
 const SECTIONS = ["1", "2", "3", "4", "5", "6", "7" , "8"];
-const CATEGORIES = ["Coding", "Math", "Behavioral", "Aptitude"];
+const CATEGORIES = ["Coding", "Aptitude", "Reasoning", "Verbal"];
 
 const API_BASE = API_CONFIG.API_BASE;
 
