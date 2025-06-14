@@ -20,7 +20,7 @@ export default defineConfig({
     },
     // For Vite 3+ you might need this instead:
     allowedHosts: [
-      'ec2-54-172-203-36.compute-1.amazonaws.com'
+      'ec2-54-172-203-36.compute-1.amazonaws.com:5173'
     ]
   }
 })
