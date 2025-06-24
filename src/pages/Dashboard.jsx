@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { API_CONFIG } from "../config/api";
+import { authenticatedFetch } from "../utils/api";
 
 const INITIAL_FORM = {
   year: "",
@@ -45,7 +46,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const res = await fetch(`${API_BASE}/tests/all`);
+        const res = await authenticatedFetch(`${API_BASE}/tests/all`);
         const data = await res.json();
         setTests(data);
       } catch (error) {
@@ -70,7 +71,7 @@ export default function Dashboard() {
 
     setLoading(true);
     try {
-      const studentsResponse = await fetch(`${API_BASE}/students?year=${year}`);
+      const studentsResponse = await authenticatedFetch(`${API_BASE}/students?year=${year}`);
       const studentsData = await studentsResponse.json();
 
       const processedData = studentsData.map((student) => {

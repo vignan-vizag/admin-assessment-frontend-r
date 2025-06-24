@@ -14,7 +14,7 @@ export default defineConfig({
 
   server: {
     host: '0.0.0.0', // Allows external connections
-    port: 5173,
+    port: 5175,
     hmr: {
       host: 'ec2-54-172-203-36.compute-1.amazonaws.com' // Your EC2 hostname
     },

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { UploadCloud } from "lucide-react";
 import { buildApiUrl, API_CONFIG } from "../config/api";
+import { authenticatedFetch } from "../utils/api";
 
 const CATEGORY_OPTIONS = ["Coding", "Aptitude", "Reasoning", "Verbal"];
 
@@ -129,9 +130,8 @@ export default function CreateTest() {
     };
 
     try {
-      const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.CREATE), {
+      const response = await authenticatedFetch(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.CREATE), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
