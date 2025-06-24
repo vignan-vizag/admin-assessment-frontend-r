@@ -69,3 +69,9 @@ export const getTest = async (testName, categoryName) => {
   const response = await apiClient.get(buildApiUrl(API_CONFIG.ENDPOINTS.TESTS.RANDOM(testName, categoryName)));
   return response.data; // assuming backend returns { randomQuestions: [...] }
 };
+
+// 🟢 Fetch overall leaderboard by graduation year
+export const fetchOverallLeaderboard = async (graduationYear) => {
+  const response = await apiClient.get(buildApiUrl(API_CONFIG.ENDPOINTS.LEADERBOARD.OVERALL(graduationYear)));
+  return response.data;
+};

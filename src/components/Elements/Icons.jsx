@@ -34,3 +34,14 @@ export const ManageTestIcon = (props) => (
     </svg>
 
 );
+
+export const LeaderboardIcon = (props) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
+    >
+        <path d="M7 16H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2v7a2 2 0 01-2 2zM14 16h-2a2 2 0 01-2-2V4a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2zM21 16h-2a2 2 0 01-2-2v-4a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2zM5 18h14a1 1 0 010 2H5a1 1 0 010-2z" />
+    </svg>
+);

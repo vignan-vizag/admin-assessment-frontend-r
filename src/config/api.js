@@ -34,13 +34,18 @@ export const API_CONFIG = {
       UPDATE: (id) => `/tests/questions/${id}`,
       DELETE: (id) => `/tests/questions/${id}`,
       ADD: '/questions/add'
+    },
+
+    // Leaderboard endpoints
+    LEADERBOARD: {
+      OVERALL: (year) => `/admin/overall-leaderboard/${year}`
     }
   }
 };
 
 // Frontend Configuration - Single source of truth for frontend URLs
 export const FRONTEND_CONFIG = {
-  BASE_URL: 'http://localhost:5173',
+  BASE_URL: 'http://localhost:5175',
   
   // Frontend route builders
   ROUTES: {
@@ -51,7 +56,8 @@ export const FRONTEND_CONFIG = {
     MANAGE_TESTS: '/manage-tests',
     UPDATE_QUESTIONS: '/update-questions',
     QUIZ: '/quiz',
-    START_TEST: '/start-test'
+    START_TEST: '/start-test',
+    LEADERBOARD: '/leaderboard'
   },
   
   // Helper to build complete frontend URLs

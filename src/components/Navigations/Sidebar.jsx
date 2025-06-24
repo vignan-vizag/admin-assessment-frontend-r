@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { DashboardIcon, CreateTestIcon, ManageTestIcon, } from "../Elements/Icons";
+import { DashboardIcon, CreateTestIcon, ManageTestIcon, LeaderboardIcon } from "../Elements/Icons";
 import { useAuth } from "../../contexts/AuthContext";
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { label: "Create Test", to: "/create-test" },
   { label: "Manage Tests", to: "/manage-tests" },
   { label: "Manage Questions", to: "/manage-questions" },
+  { label: "Leaderboard", to: "/leaderboard" },
 ];
 
 const iconMap = {
@@ -14,6 +15,7 @@ const iconMap = {
   "Create Test": <CreateTestIcon className="w-5 h-5 shrink-0" />,
   "Manage Tests": <ManageTestIcon className="w-5 h-5 shrink-0" />,
   "Manage Questions": <ManageTestIcon className="w-5 h-5 shrink-0" />,
+  Leaderboard: <LeaderboardIcon className="w-5 h-5 shrink-0" />,
 };
 
 function NavItem({ label, to, external = false, isActive, isCollapsed }) {

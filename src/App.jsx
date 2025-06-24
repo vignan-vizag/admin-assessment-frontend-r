@@ -8,6 +8,7 @@ import UpdateQuestions from "./pages/UpdateQuestions";
 import StartTest from "./pages/StartTest";
 import QuizPage from "./pages/QuizPage";
 import MyTests from "./pages/MyTests";
+import Leaderboard from "./pages/Leaderboard";
 import Header from "./components/Navigations/Header";
 import Login from "./pages/Login";
 import { useEffect, useState } from "react";
@@ -67,6 +68,7 @@ export default function App() {
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/test/:testId" element={<TestDetailsPage />} />
             <Route path="/mytests" element={<MyTests />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
           </Route>
         </Routes>
       </Router>
