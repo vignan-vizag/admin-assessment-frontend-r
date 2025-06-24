@@ -70,8 +70,22 @@ export const getTest = async (testName, categoryName) => {
   return response.data; // assuming backend returns { randomQuestions: [...] }
 };
 
-// 🟢 Fetch overall leaderboard by graduation year
-export const fetchOverallLeaderboard = async (graduationYear) => {
-  const response = await apiClient.get(buildApiUrl(API_CONFIG.ENDPOINTS.LEADERBOARD.OVERALL(graduationYear)));
+// 🟢 Fetch overall leaderboard by graduation year with filters
+export const fetchOverallLeaderboard = async (graduationYear, filters = {}) => {
+  const queryParams = new URLSearchParams();
+  
+  // Add filters as query parameters if they exist
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value && value !== '') {
+      queryParams.append(key, value);
+    }
+  });
+  
+  const queryString = queryParams.toString();
+  const url = queryString 
+    ? `${buildApiUrl(API_CONFIG.ENDPOINTS.LEADERBOARD.OVERALL(graduationYear))}?${queryString}`
+    : buildApiUrl(API_CONFIG.ENDPOINTS.LEADERBOARD.OVERALL(graduationYear));
+  
+  const response = await apiClient.get(url);
   return response.data;
 };

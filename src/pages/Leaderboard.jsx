@@ -3,22 +3,37 @@ import { fetchOverallLeaderboard } from "../api/testApi";
 
 export default function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState(null);
-  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedYear, setSelectedYear] = useState("2026");
+  const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+  const [selectedSpecificYear, setSelectedSpecificYear] = useState("");
+  const [selectedLimit, setSelectedLimit] = useState("25");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Generate years from 2020 to current year + 4
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: currentYear + 4 - 2020 + 1 }, (_, i) => 2020 + i);
+  const branches = ["CSE", "ECE", "EEE", "AIDS", "AI", "DS", "CS", "MECH", "CIVIL", "ECM", "IT"];
+  const sections = ["1", "2", "3", "4", "5", "6", "7", "8"];
+  const limits = ["10", "15", "20", "25", "50", "100"];
 
-  const loadLeaderboard = async (year) => {
-    if (!year) return;
+  const loadLeaderboard = async () => {
+    if (!selectedYear) return;
     
     setLoading(true);
     setError("");
     
     try {
-      const data = await fetchOverallLeaderboard(year);
+      const filters = {};
+      
+      // Add filters based on selections
+      if (selectedBranch) filters.branch = selectedBranch;
+      if (selectedSection) filters.section = selectedSection;
+      if (selectedSpecificYear) filters.specificYear = selectedSpecificYear;
+      if (selectedLimit && selectedLimit !== '25') filters.limit = selectedLimit;
+      
+      const data = await fetchOverallLeaderboard(selectedYear, filters);
       setLeaderboardData(data);
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
@@ -29,13 +44,31 @@ export default function Leaderboard() {
   };
 
   const handleYearChange = (e) => {
-    const year = e.target.value;
-    setSelectedYear(year);
-    if (year) {
-      loadLeaderboard(year);
-    } else {
-      setLeaderboardData(null);
+    setSelectedYear(e.target.value);
+  };
+
+  const handleBranchChange = (e) => {
+    setSelectedBranch(e.target.value);
+    // Reset section when branch changes
+    if (!e.target.value) {
+      setSelectedSection("");
     }
+  };
+
+  const handleSectionChange = (e) => {
+    setSelectedSection(e.target.value);
+  };
+
+  const handleSpecificYearChange = (e) => {
+    setSelectedSpecificYear(e.target.value);
+  };
+
+  const handleLimitChange = (e) => {
+    setSelectedLimit(e.target.value);
+  };
+
+  const handleFetchLeaderboard = () => {
+    loadLeaderboard();
   };
 
   const getRankBadgeColor = (rank) => {
@@ -52,25 +85,131 @@ export default function Leaderboard() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-4">Overall Leaderboard</h1>
           
-          {/* Year Selection */}
-          <div className="flex items-center gap-4">
-            <label htmlFor="graduationYear" className="text-lg font-medium text-gray-700">
-              Select Graduation Year:
-            </label>
-            <select
-              id="graduationYear"
-              value={selectedYear}
-              onChange={handleYearChange}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">-- Select Year --</option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
+          {/* Filter Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+            {/* Context Year */}
+            <div>
+              <label htmlFor="graduationYear" className="block text-sm font-medium text-gray-700 mb-1">
+                Context Year <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="graduationYear"
+                value={selectedYear}
+                onChange={handleYearChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Branch Filter */}
+            <div>
+              <label htmlFor="branchFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                Branch Filter
+              </label>
+              <select
+                id="branchFilter"
+                value={selectedBranch}
+                onChange={handleBranchChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Branches</option>
+                {branches.map((branch) => (
+                  <option key={branch} value={branch}>
+                    {branch}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Section Filter */}
+            <div>
+              <label htmlFor="sectionFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                Section Filter
+              </label>
+              <select
+                id="sectionFilter"
+                value={selectedSection}
+                onChange={handleSectionChange}
+                disabled={!selectedBranch}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm disabled:bg-gray-100"
+              >
+                <option value="">All Sections</option>
+                {sections.map((section) => (
+                  <option key={section} value={section}>
+                    {section}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Specific Year Filter */}
+            <div>
+              <label htmlFor="specificYear" className="block text-sm font-medium text-gray-700 mb-1">
+                Specific Year
+              </label>
+              <select
+                id="specificYear"
+                value={selectedSpecificYear}
+                onChange={handleSpecificYearChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Years</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Result Limit */}
+            <div>
+              <label htmlFor="resultLimit" className="block text-sm font-medium text-gray-700 mb-1">
+                Result Limit
+              </label>
+              <select
+                id="resultLimit"
+                value={selectedLimit}
+                onChange={handleLimitChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              >
+                {limits.map((limit) => (
+                  <option key={limit} value={limit}>
+                    Top {limit}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Fetch Button */}
+            <div className="flex items-end">
+              <button
+                onClick={handleFetchLeaderboard}
+                disabled={loading || !selectedYear}
+                className="w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                {loading ? "Loading..." : "Fetch Leaderboard"}
+              </button>
+            </div>
           </div>
+
+          {/* Applied Filters Display */}
+          {leaderboardData?.appliedFilters && (
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <h3 className="text-sm font-semibold text-blue-800 mb-1">Applied Filters:</h3>
+              <div className="text-xs text-blue-600 grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div>Branch: {leaderboardData.appliedFilters.branch}</div>
+                <div>Section: {leaderboardData.appliedFilters.section}</div>
+                <div>Year: {leaderboardData.appliedFilters.specificYear}</div>
+                <div>Limit: {leaderboardData.appliedFilters.limit}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Error Message */}
@@ -218,7 +357,7 @@ export default function Leaderboard() {
               {/* Empty state */}
               {leaderboardData.overallLeaderboard.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">No students found for the selected year.</p>
+                  <p className="text-gray-500">No students found for the selected criteria.</p>
                 </div>
               )}
             </div>
@@ -226,15 +365,15 @@ export default function Leaderboard() {
         )}
 
         {/* No Data Selected */}
-        {!selectedYear && !loading && (
+        {!leaderboardData && !loading && (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <div className="text-gray-400 mb-4">
               <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-700 mb-2">Select Graduation Year</h3>
-            <p className="text-gray-500">Choose a graduation year from the dropdown above to view the leaderboard.</p>
+            <h3 className="text-lg font-medium text-gray-700 mb-2">Fetch Overall Leaderboard</h3>
+            <p className="text-gray-500">Click "Fetch Leaderboard" above to view the overall rankings with your selected filters.</p>
           </div>
         )}
       </div>
