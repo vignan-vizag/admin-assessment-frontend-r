@@ -21,15 +21,20 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  // Improved auth check that preserves session on refresh unless token is explicitly invalid (401)
   const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      setIsAuthenticated(false);
+      setLoading(false);
+      return;
+    }
 
-      // Verify token with backend
+    // Optimistically mark as authenticated so UI doesn't flicker or redirect on refresh
+    setIsAuthenticated(true);
+    setLoading(false); // We don't block the UI waiting for verify
+
+    try {
       const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.AUTH.VERIFY), {
         method: 'GET',
         headers: {
@@ -41,18 +46,19 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-        setIsAuthenticated(true);
-      } else {
-        // Token is invalid, remove it
+      } else if (response.status === 401) {
+        // Only clear token & de-authenticate on an explicit unauthorized response
         localStorage.removeItem('adminToken');
         setIsAuthenticated(false);
+        setUser(null);
+      } else {
+        // For other errors (network, 5xx, 404) keep the optimistic auth state;
+        // devs can inspect console to diagnose backend issues
+        console.warn('Token verify non-401 error:', response.status);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      localStorage.removeItem('adminToken');
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
+      // Network or unexpected error – keep user logged in (optimistic) unless we know it's invalid
+      console.error('Auth verify request failed:', error);
     }
   };
 

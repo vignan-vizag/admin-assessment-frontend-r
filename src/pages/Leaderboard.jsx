@@ -285,9 +285,7 @@ export default function Leaderboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Performance
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category Breakdown
-                      </th>
+                      {/* Category Breakdown column removed per requirement */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -332,22 +330,7 @@ export default function Leaderboard() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="grid grid-cols-2 gap-1 text-xs">
-                            <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                              Coding: {student.categoryBreakdown.coding}
-                            </div>
-                            <div className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                              Aptitude: {student.categoryBreakdown.aptitude}
-                            </div>
-                            <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                              Reasoning: {student.categoryBreakdown.reasoning}
-                            </div>
-                            <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded">
-                              Verbal: {student.categoryBreakdown.verbal}
-                            </div>
-                          </div>
-                        </td>
+                        {/* Category Breakdown cell removed */}
                       </tr>
                     ))}
                   </tbody>
