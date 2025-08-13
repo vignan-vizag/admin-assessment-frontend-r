@@ -36,6 +36,12 @@ export const API_CONFIG = {
       ADD: '/questions/add'
     },
 
+    // Students endpoints
+    STUDENTS: {
+      BY_YEAR: (year) => `/students?year=${year}`,
+      ALL: '/students'
+    },
+
     // Leaderboard endpoints
     LEADERBOARD: {
       OVERALL: (year) => `/admin/overall-leaderboard/${year}`
